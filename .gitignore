@@ -1,9 +1,9 @@
 # internal strategy docs — never publish
 /internal/
 
-# acceptance test set — real (sanitized) resumes, NEVER public
-/testset/
-/testset_raw.tsv
+# acceptance test set — real (sanitized or raw) resume data, NEVER public
+/testset*/
+testset_raw*.tsv
 
 # personal raw data
 p0/samples/linkedin-steven*.txt
