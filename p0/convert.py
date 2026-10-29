@@ -20,6 +20,29 @@ from extract import extract, validate  # noqa: E402
 from render import render          # noqa: E402
 
 
+def _syntax_guard(html: str) -> None:
+    """Fail-closed: extract the inline <script> and node --check it."""
+    import shutil
+    import subprocess
+    import tempfile
+    s = html[html.find("<script>") + 9: html.find("</script>")]
+    node = shutil.which("node")
+    if not node:
+        print("[warn] node not found — skipped JS syntax guard")
+        return
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as f:
+        f.write(s)
+        path = f.name
+    try:
+        r = subprocess.run([node, "--check", path], capture_output=True, text=True)
+        if r.returncode != 0:
+            print("[fail] rendered page has a JS syntax error — page NOT written:")
+            print(r.stderr[:500])
+            sys.exit(1)
+    finally:
+        Path(path).unlink(missing_ok=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("input")
@@ -56,7 +79,9 @@ def main() -> int:
     outdir.mkdir(parents=True, exist_ok=True)
     (outdir / "talent-object.json").write_text(
         json.dumps(obj, ensure_ascii=False, indent=2), encoding="utf-8")
-    (outdir / "page.html").write_text(render(obj), encoding="utf-8")
+    html = render(obj)
+    _syntax_guard(html)   # never ship a page whose script cannot parse
+    (outdir / "page.html").write_text(html, encoding="utf-8")
 
     n_ev = len(obj.get("career_events", []))
     n_num = sum(len(e.get("evidence_numbers", [])) for e in obj.get("career_events", []))
