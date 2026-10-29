@@ -40,10 +40,12 @@ __VERBS__
 铁律：
 1. 每个 node 必须锚定一个原句（sentence_idx 指向输入的下标），禁止发明原文没有的步骤
 2. 只有原句有明确先后/数据流向线索时才允许 inferred:false 的边；其余连接一律 inferred:true 并写入 notes
-3. verb 优先归一到词典动词
+3. verb 归一**仅在语义真正吻合**时使用词典动词；没有合适的词典动词时**必须保留原句动词**，禁止为了归一而硬套（"负责销售"是"销售"不是"销售洞察"；"参与试验"是"参与"不是"方案设计"）
 4. 一句可拆多个节点（句内含多步骤时），一个节点不得跨句拼接
 5. nodes 按 s1..sN 编号，edges 的 from/to 必须引用存在的节点 id
 6. 拆不动的句子（太笼统，如"负责数据相关工作"）直接跳过，不要硬造节点
+7. 同一事件内不得产生重复节点（同句+同动词+同对象视为重复）
+8. output 必须直接来自原句文字或其明显改写，禁止外推未提及的结果
 
 经历对象：
 """
@@ -64,17 +66,42 @@ def extract_steps(event: dict, event_index: int) -> dict:
         return {"event_index": event_index, "nodes": [], "edges": [],
                 "notes": ["MOCK BACKEND: no real extraction — set ANTHROPIC_AUTH_TOKEN to enable"]}
     payload = {"role": str(event.get("role", "")), "org": str(event.get("org", "")), "highlights": sentences}
-    raw = _anthropic(PROMPT_HEADER.replace("__VERBS__", _load_verbs()) + json.dumps(payload, ensure_ascii=False))
-    obj = _loads_lenient(raw)
+    prompt = PROMPT_HEADER.replace("__VERBS__", _load_verbs()) + json.dumps(payload, ensure_ascii=False)
+    obj = None
+    for attempt in range(2):   # one full retry on malformed/truncated JSON
+        try:
+            obj = _loads_lenient(_anthropic(prompt))
+            break
+        except json.JSONDecodeError:
+            if attempt == 1:
+                raise
     wf = {"event_index": event_index,
-          "nodes": obj.get("nodes", []),
+          "nodes": _dedup_nodes(obj.get("nodes", [])),
           "edges": obj.get("edges", []),
           "notes": obj.get("notes", [])}
+    _drop_dangling_edges(wf)
     problems = validate_workflow(wf, len(sentences))
     if problems:
         wf["nodes"], wf["edges"] = [], []
         wf["notes"] = ["EXTRACTION REJECTED (fail-closed): " + "; ".join(problems)]
     return wf
+
+
+def _dedup_nodes(nodes: list) -> list:
+    """Drop duplicate nodes (same sentence + verb + object prefix) keeping the first."""
+    seen, out = set(), []
+    for n in nodes:
+        key = (n.get("sentence_idx"), n.get("verb"), str(n.get("object", ""))[:12])
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(n)
+    return out
+
+
+def _drop_dangling_edges(wf: dict) -> None:
+    ids = {n["id"] for n in wf["nodes"]}
+    wf["edges"] = [e for e in wf.get("edges", []) if e.get("from") in ids and e.get("to") in ids]
 
 
 def validate_workflow(wf: dict, n_sentences: int) -> list[str]:
@@ -113,7 +140,7 @@ def _anthropic(prompt: str) -> str:
     base = os.environ.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com").rstrip("/")
     token = os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_API_KEY")
     model = os.environ.get("ANTHROPIC_DEFAULT_SONNET_MODEL", "claude-sonnet-5-5")
-    body = json.dumps({"model": model, "max_tokens": 3000, "temperature": 0,
+    body = json.dumps({"model": model, "max_tokens": 4000, "temperature": 0,
                        "messages": [{"role": "user", "content": prompt[:20000]}]}).encode("utf-8")
     req = urllib.request.Request(base + "/v1/messages", data=body, method="POST", headers={
         "content-type": "application/json", "anthropic-version": "2023-06-01",
@@ -124,14 +151,41 @@ def _anthropic(prompt: str) -> str:
 
 
 def _loads_lenient(raw: str) -> dict:
+    """strip fences -> salvage object -> repair truncation; raises on failure."""
     raw = re.sub(r"^```(json)?|```$", "", raw.strip(), flags=re.MULTILINE).strip()
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", raw, flags=re.DOTALL)
-        if m:
-            return json.loads(m.group(0))
-        raise
+        pass
+    m = re.search(r"\{.*", raw, flags=re.DOTALL)
+    candidate = m.group(0) if m else raw
+    return json.loads(_repair_truncated(candidate))
+
+
+def _repair_truncated(s: str) -> str:
+    """Close unbalanced strings/brackets of a truncated JSON object."""
+    s = s.rstrip().rstrip(",")
+    in_str, esc = False, False
+    stack = []
+    for ch in s:
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+        elif ch == '"':
+            in_str = True
+        elif ch in "{[":
+            stack.append(ch)
+        elif ch in "}]":
+            if stack:
+                stack.pop()
+    if in_str:
+        s += '"'
+    s += "".join("}" if c == "{" else "]" for c in reversed(stack))
+    return s
 
 
 def extract_all(obj: dict) -> list[dict]:

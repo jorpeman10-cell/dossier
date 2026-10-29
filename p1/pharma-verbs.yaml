@@ -153,3 +153,58 @@ GxP验证:
   aliases: [事后分析, postmortem, 根因分析]
   typical_object: 事故/项目
   typical_output: 复盘报告
+销售:
+  domain: COMMERCIAL
+  aliases: [负责销售, 区域销售, selling, 产品销售]
+  typical_object: 产品/区域
+  typical_output: 销售业绩/份额
+推广:
+  domain: COMMERCIAL
+  aliases: [学术推广, 市场推广, promotion]
+  typical_object: 产品/学术活动
+  typical_output: 推广活动落地
+客户开发:
+  domain: COMMERCIAL
+  aliases: [医院开发, 新客户开发, 商务拜访]
+  typical_object: 医院/客户
+  typical_output: 新客户/进院
+汇报:
+  domain: OPS
+  aliases: [定期汇报, 进度汇报, report]
+  typical_object: 项目进度/业务
+  typical_output: 汇报材料
+管理:
+  domain: OPS
+  aliases: [带领, 团队管理, 负责, 主管]
+  typical_object: 团队/业务
+  typical_output: 团队/业务成果
+审核:
+  domain: OPS
+  aliases: [审阅, 审核, review]
+  typical_object: 文件/方案/材料
+  typical_output: 审核意见
+撰写:
+  domain: OPS
+  aliases: [起草, 编写, 编制, author]
+  typical_object: 文档/计划/报告
+  typical_output: 文档交付
+沟通:
+  domain: OPS
+  aliases: [协调, 对接, 跨部门沟通, liaison]
+  typical_object: 内外部相关方
+  typical_output: 沟通协调落地
+执行:
+  domain: OPS
+  aliases: [实施, 落地, 贯彻]
+  typical_object: 计划/项目
+  typical_output: 执行结果
+参与:
+  domain: OPS
+  aliases: [支持, 协助, 配合]
+  typical_object: 项目/试验/活动
+  typical_output: 参与贡献
+解决:
+  domain: OPS
+  aliases: [处理, 排查, 问题解决]
+  typical_object: 问题/异常
+  typical_output: 解决方案
