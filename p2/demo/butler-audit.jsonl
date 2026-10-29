@@ -1,0 +1,6 @@
+{"ts": 1793281323, "action": "ask", "q_len": 11, "hits": 3, "blocked": true}
+{"ts": 1793281323, "action": "get_profile.denied", "section": "preferences"}
+{"ts": 1793281359, "action": "ask", "q_len": 11, "hits": 3, "blocked": true}
+{"ts": 1793281359, "action": "get_profile.denied", "section": "preferences"}
+{"ts": 1793281399, "action": "ask", "q_len": 11, "hits": 3, "blocked": true}
+{"ts": 1793281399, "action": "get_profile.denied", "section": "preferences"}

@@ -1,0 +1,43 @@
+{
+  "identity": {"display_name": "陈之遥（匿名展示名）", "real_name": "陈之遥", "anon_id": "to-demo-001"},
+  "meta": {"tagline": "八年肿瘤证据经验，转型医药AI架构师", "city": "上海"},
+  "career_events": [
+    {"start": "2024", "end": null, "role": "医药AI解决方案架构师", "org": "某头部创新药企",
+     "highlights": [
+       "主导 RWE-X 真实世界证据平台从0到1建设，覆盖3个瘤种、11万患者医保数据池",
+       "设计并上线证据摘要 agent，产出周期从5天压缩到1天",
+       "建立医保信号监测工作流，2025年提前40天捕获目录调整信号"
+     ],
+     "evidence_numbers": ["3个瘤种", "11万患者医保数据池", "5天压缩到1天", "提前40天"]},
+    {"start": "2016", "end": "2024", "role": "肿瘤医学顾问/生物统计师", "org": "某外企/某CRO",
+     "highlights": [
+       "交付14个肿瘤临床试验（I-III期）统计分析",
+       "负责两个肿瘤产品上市周期的证据解读"
+     ], "evidence_numbers": ["14个肿瘤临床试验"]}
+  ],
+  "skills": {"silicon": ["Python", "SQL", "Claude API / Agent SDK", "RAG"], "carbon": ["肿瘤循证医学", "真实世界研究", "医保数据"]},
+  "certs": ["工信部医疗数据要素认证（2025）"],
+  "education": [{"years": "2009-2013", "school": "山东财经大学", "major": "统计学"}],
+  "workflows": [
+    {"event_index": 0, "nodes": [
+      {"id": "s1", "verb": "搭建", "object": "RWE-X平台", "output": "11万患者数据池", "sentence_idx": 0, "stated": true},
+      {"id": "s2", "verb": "部署", "object": "证据摘要agent", "output": "摘要周期5天→1天", "sentence_idx": 1, "stated": true}],
+     "edges": [{"from": "s1", "to": "s2", "kind": "dataflow", "inferred": true}], "notes": ["演示数据"]}
+  ],
+  "verification": {
+    "claims": [
+      {"id": "claim-rwe-x", "text": "RWE-X平台覆盖3个瘤种、11万患者池", "mark": "◐",
+       "level": "V2", "checked_on": "2026-10-29", "signature": "registry-sig-demo-7f3a"}
+    ],
+    "high_watermark": "V2"
+  },
+  "agent_config": {
+    "access": {"preferences": "nda", "contact": "nda", "workflows": "community"},
+    "preferences": {"open_to": ["医药AI解决方案类角色"], "location": "上海/远程", "availability": "可谈"},
+    "contact": {"email": "demo@example.com", "phone": "[脱敏]"},
+    "grants": {
+      "grant-employer-001": {"level": "nda", "purpose": "某雇主深度评估", "used": false},
+      "grant-reveal-001": {"level": "nda", "purpose": "一次性实名揭示", "used": false}
+    }
+  }
+}
