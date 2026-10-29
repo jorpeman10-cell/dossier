@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--
+  ✦dossier template v0.1
+  Agent instructions: replace ALL content (text, data-zh, data-en attributes, links,
+  SLOT markers). Keep structure, classes, the language toggle, and the footer
+  attribution intact. Sections with zero evidence must be deleted entirely.
+  The content below is a FICTIONAL EXAMPLE person — replace with interview data.
+-->
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- SLOT:TITLE --><title>陈之遥 — 医药AI解决方案架构师</title>
+<style>
+  :root{
+    --paper:#f6f2e9; --ink:#2b2620; --muted:#8a7a5c; --rule:#d8cfbd;
+    --link:#5b4a2f; --ok:#2e7d32; --half:#b26a00; --self:#8d8d8d; --card:#fbf9f3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Georgia,"Noto Serif SC","Songti SC","SimSun",serif;
+    line-height:1.75; font-size:16px;
+  }
+  main{max-width:760px; margin:0 auto; padding:48px 24px 24px;}
+  a{color:var(--link); text-decoration:none; border-bottom:1px solid var(--rule);}
+  a:hover{border-bottom-color:var(--link);}
+  strong{font-weight:700;}
+  em{font-style:italic;}
+
+  /* language toggle */
+  .langbar{position:fixed; top:14px; right:18px; font-size:13px; letter-spacing:.2em; z-index:9;}
+  .langbar button{
+    background:none; border:none; color:var(--muted); font:inherit; cursor:pointer; padding:2px 6px;
+  }
+  .langbar button.active{color:var(--ink); border-bottom:1px solid var(--ink);}
+  .langbar .dot{color:var(--rule);}
+
+  /* entry header */
+  .brand{font-size:12px; letter-spacing:.35em; color:var(--muted); text-transform:uppercase;}
+  h1{font-size:40px; font-weight:400; letter-spacing:.06em; margin-top:18px;}
+  .tagline{font-size:19px; color:var(--muted); margin-top:6px;}
+  .entrymeta{font-size:13px; letter-spacing:.25em; color:var(--muted); margin-top:14px;}
+
+  .orn{display:flex; align-items:center; gap:16px; color:var(--muted); margin:44px 0 26px;}
+  .orn::before,.orn::after{content:""; flex:1; border-top:1px solid var(--rule);}
+  .orn span{font-size:13px; letter-spacing:.5em; white-space:nowrap;}
+
+  .narrative .def{font-size:13px; letter-spacing:.15em; color:var(--muted); margin-bottom:4px;}
+  .narrative .quote{font-size:14px; color:var(--muted); font-style:italic; margin-top:22px;}
+  .narrative p{margin-bottom:14px; text-align:justify;}
+
+  /* a working day */
+  .day{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .day .slot{border-top:2px solid var(--ink); padding-top:14px;}
+  .day .num{font-size:13px; color:var(--muted); letter-spacing:.3em;}
+  .day h3{font-size:17px; font-weight:400; margin:6px 0 8px;}
+  .day p{font-size:14px; color:#4a4237; line-height:1.7;}
+
+  /* opinions */
+  .views .opinion{padding-left:20px; border-left:2px solid var(--rule); margin-bottom:20px;}
+  .views .opinion p{font-size:17px;}
+
+  /* works */
+  .legend{font-size:12.5px; color:var(--muted); text-align:center; margin:-10px 0 22px; letter-spacing:.05em;}
+  ol.works{list-style:none;}
+  ol.works li{display:grid; grid-template-columns:44px 1fr 22px; gap:8px; padding:14px 0; border-bottom:1px solid var(--rule); align-items:baseline;}
+  ol.works .no{font-size:15px; color:var(--muted); letter-spacing:.1em;}
+  ol.works .wt a{font-size:16.5px;}
+  ol.works .wm{font-size:13px; color:var(--muted); margin-top:3px;}
+  .mark{font-size:14px; cursor:help;}
+  .m-ok{color:var(--ok);} .m-half{color:var(--half);} .m-self{color:var(--self);}
+
+  /* field log */
+  .log{border-left:1px solid var(--rule);}
+  .log .item{position:relative; padding:0 0 30px 28px;}
+  .log .item::before{content:"✦"; position:absolute; left:-8px; top:2px; color:var(--muted); font-size:12px; background:var(--paper); padding:0 2px;}
+  .log .years{font-size:13px; letter-spacing:.2em; color:var(--muted);}
+  .log h3{font-size:18px; font-weight:400; margin:4px 0 2px;}
+  .log .org{font-size:14px; color:var(--muted); margin-bottom:8px;}
+  .log p{font-size:15px; text-align:justify;}
+
+  /* dual toolbar */
+  .tools{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  .tools .col h3{font-size:15px; font-weight:400; letter-spacing:.3em; color:var(--muted); border-bottom:1px solid var(--rule); padding-bottom:8px; margin-bottom:12px;}
+  .tools .col p{font-size:14px; color:#4a4237; line-height:1.9;}
+
+  /* contact */
+  .contact{text-align:center; padding:10px 0;}
+  .contact .ask{font-size:20px; margin-bottom:18px;}
+  .contact .meta{font-size:14px; color:var(--muted); letter-spacing:.12em;}
+  .contact .meta span{margin:0 10px;}
+
+  footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--rule); text-align:center; font-size:12.5px; color:var(--muted); letter-spacing:.08em; line-height:2;}
+  footer .echo{font-size:11px; letter-spacing:.35em; text-transform:uppercase;}
+
+  @media (max-width:640px){
+    h1{font-size:30px;}
+    .day{grid-template-columns:1fr;}
+    .tools{grid-template-columns:1fr;}
+  }
+  @media print{
+    .langbar{display:none;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+<div class="langbar">
+  <button id="btn-zh" class="active" onclick="setLang('zh')">中</button><span class="dot">·</span><button id="btn-en" onclick="setLang('en')">EN</button>
+</div>
+<main>
+
+  <!-- SLOT:HEADER -->
+  <div class="brand">✦dossier / entry</div>
+  <h1><span data-en="Zhiyao Chen">陈之遥</span></h1>
+  <div class="tagline" data-en="Pharma AI Solutions Architect — oncology real-world evidence">医药AI解决方案架构师 · 肿瘤真实世界证据</div>
+  <div class="entrymeta">Entry No. 001 · Vol. 2026 · <span data-en="Shanghai">上海</span></div>
+
+  <!-- SLOT:NARRATIVE -->
+  <div class="orn"><span data-en="narrative">自我叙事</span></div>
+  <section class="narrative">
+    <div class="def" data-en="zhiyao chen, noun — a translator between trial data and treatment reality">zhī yáo chen，名词 — 在试验数据和治疗现实之间做翻译的人</div>
+    <p data-en="I spent eight years turning oncology evidence into decisions: three years reading trials as a medical affairs lead, five years building the data platforms those decisions run on. Since 2024 my work is agents — an RWE agent that drafts evidence summaries from structured trial and claims data, in production across two therapeutic areas.">八年肿瘤证据生涯：前三年在医学事务读试验，后五年在建证据跑的那条数据管道。2024年起做的是 agent——一个从结构化试验与医保数据起草证据摘要的真实世界证据 agent，已在两个治疗领域进生产。</p>
+    <p>平台有名字，数字可查：<strong>RWE-X 证据平台</strong>覆盖 <strong>3个瘤种、11万患者池</strong>；医保信号监测工作流每周跑一次，去年提前 <strong>40天</strong> 捕获了一次目录调整信号。<em>我认为不读方案的架构师做不好医学数据平台。</em></p>
+    <div class="quote" data-en="see also: works (below); workflow assets registered in the community registry.">see also：著录（见下）；工作流资产见社群登记处。</div>
+  </section>
+
+  <!-- SLOT:DAY -->
+  <div class="orn"><span data-en="a working day">一天的工作</span></div>
+  <section class="day">
+    <div class="slot">
+      <div class="num">i · <span data-en="morning">上午</span></div>
+      <h3 data-en="Read the evidence">读证据</h3>
+      <p data-en="Sweep the week's oncology literature and three claims-data alerts; mark what changes our evidence map.">扫完本周肿瘤文献和三条医保数据异动，标记证据地图上要动的位置。</p>
+    </div>
+    <div class="slot">
+      <div class="num">ii · <span data-en="afternoon">下午</span></div>
+      <h3 data-en="Run the agents">跑 agent</h3>
+      <p data-en="Supervise the RWE agent drafting three evidence summaries; correct citations, not conclusions.">看着真实世界证据 agent 起草三份证据摘要，改引用，不改结论。</p>
+    </div>
+    <div class="slot">
+      <div class="num">iii · <span data-en="evening">晚上</span></div>
+      <h3 data-en="Package the reuse">封装复用</h3>
+      <p data-en="Turn whatever I corrected twice into a reusable prompt module; push it to the team library.">把今天人工纠正过两次的东西固化成可复用模块，推到团队库。</p>
+    </div>
+  </section>
+
+  <!-- SLOT:VIEWS -->
+  <div class="orn"><span data-en="opinions">观点</span></div>
+  <section class="views">
+    <div class="opinion">
+      <p data-en="Most &quot;RWE AI products&quot; die because they sell the model, not the evidence map underneath it. The map is the asset; the model is a reader.">大部分「真实世界证据 AI」死在卖模型不卖证据地图——地图才是资产，模型只是读地图的人。</p>
+    </div>
+    <div class="opinion">
+      <p data-en="An evidence summary no medical advisor would sign is worth less than no summary at all.">一份医学顾问不肯签字的证据摘要，不如没有摘要。</p>
+    </div>
+  </section>
+
+  <!-- SLOT:WORKS -->
+  <div class="orn"><span data-en="works">著录</span></div>
+  <div class="legend" data-en="marks: ✓ expert-verified · ◐ works-checkable (link verified {date}) · ○ self-reported">标记：✓ 专家核验 · ◐ 作品可查（链接已核验 2026-10）· ○ 本人自述</div>
+  <ol class="works">
+    <li><span class="no">01</span>
+      <div>
+        <div class="wt"><a href="#" onclick="return false" data-en="Building an oncology RWE agent — field notes">搭建肿瘤真实世界证据 agent 的田野手记</a></div>
+        <div class="wm">2026-06 · <span data-en="agent engineering">agent 工程</span></div>
+      </div>
+      <span class="mark m-half" title="作品可查 · verified 2026-10">◐</span>
+    </li>
+    <li><span class="no">02</span>
+      <div>
+        <div class="wt"><a href="#" onclick="return false" data-en="Claims-data early-warning workflow (open source)">医保数据预警工作流（开源）</a></div>
+        <div class="wm">2026-08 · <span data-en="workflow asset">工作流资产</span> · GitHub</div>
+      </div>
+      <span class="mark m-ok" title="专家核验 · 2026-09">✓</span>
+    </li>
+    <li><span class="no">03</span>
+      <div>
+        <div class="wt"><a href="#" onclick="return false" data-en="National medical-insurance data competition, second prize">全国医保数据大赛二等奖</a></div>
+        <div class="wm">2025 · <span data-en="award">获奖</span></div>
+      </div>
+      <span class="mark m-half" title="作品可查 · verified 2026-10">◐</span>
+    </li>
+  </ol>
+
+  <!-- SLOT:FIELDLOG -->
+  <div class="orn"><span data-en="field log">田野日志</span></div>
+  <section class="log">
+    <div class="item">
+      <div class="years">2024 — NOW</div>
+      <h3 data-en="Pharma AI Solutions Architect">医药AI解决方案架构师</h3>
+      <div class="org" data-en="A top-20 innovative pharma · Medical Affairs · Shanghai">某头部创新药企 · 医学事务 · 上海</div>
+      <p data-en="Architected the RWE-X evidence platform from 0 to 1: 3 tumor types, a 110k-patient claims pool, GxP-aware data lineage. Put the RWE agent into production in two therapeutic areas; evidence-summary turnaround dropped from 5 days to 1.">RWE-X 证据平台从0到1：3个瘤种、11万患者医保数据池、合规可溯的数据血缘。真实世界证据 agent 在两个治疗领域进生产，证据摘要周期从5天压到1天。</p>
+    </div>
+    <div class="item">
+      <div class="years">2021 — 2024</div>
+      <h3 data-en="Medical Advisor, Oncology">肿瘤医学顾问</h3>
+      <div class="org" data-en="A global pharma · Oncology MA · Shanghai">某外企 · 肿瘤医学部 · 上海</div>
+      <p data-en="Owned evidence interpretation for two launches; built the department's first literature-monitoring pipeline, cutting weekly scan time from 6 hours to 40 minutes for the whole team.">负责两个产品上市周期的证据解读；建了部门第一条文献监测管道，全组每周扫描时间从6小时降到40分钟。</p>
+    </div>
+    <div class="item">
+      <div class="years">2016 — 2021</div>
+      <h3 data-en="Biostatistician">生物统计师</h3>
+      <div class="org" data-en="A CRO · Statistics · Beijing">某CRO · 统计部 · 北京</div>
+      <p data-en="Delivered analyses for 14 oncology trials (Phase I–III); built the standard-tables macro library adopted company-wide.">交付14个肿瘤试验（I–III期）的统计分析；搭建的公司级标准表格宏库被全公司采用。</p>
+    </div>
+  </section>
+
+  <!-- SLOT:TOOLBAR -->
+  <div class="orn"><span data-en="toolbar · tools are an index, not the point">工具栏 · 列举仅为索引，能力不在于器</span></div>
+  <section class="tools">
+    <div class="col">
+      <h3 data-en="silicon — AI stack">硅 · AI 栈</h3>
+      <p data-en="Agentic system design · Claude API & Agent SDK · RAG over structured evidence · eval harnesses · LLMOps · Python · SQL · dbt">agent 系统设计 · Claude API / Agent SDK · 结构化证据 RAG · eval 测试框架 · LLMOps · Python · SQL · dbt</p>
+    </div>
+    <div class="col">
+      <h3 data-en="carbon — domain stack">碳 · 领域栈</h3>
+      <p data-en="Oncology evidence interpretation (8y) · RWD/RWE & claims data · medical affairs process · GxP awareness · HTA basics · MIIT healthcare data-element certificate">肿瘤证据解读（8年）· 真实世界数据与医保数据 · 医学事务流程 · GxP 认知 · 卫生技术评估基础 · 工信部医疗数据要素认证</p>
+    </div>
+  </section>
+
+  <!-- SLOT:CONTACT -->
+  <div class="orn"><span data-en="get in touch">取得联系</span></div>
+  <section class="contact">
+    <div class="ask" data-en="What decision are you still making by hand?">你手上还有什么决策，是纯靠人肉在拼的？</div>
+    <div class="meta">
+      <a href="mailto:example@example.com">example@example.com</a>
+      <span data-en="Shanghai">上海</span>
+    </div>
+    <div class="meta" style="margin-top:8px" data-en="Company name withheld — availability discussed directly.">在职信息脱敏 · 机会沟通走邮件</div>
+  </section>
+
+  <footer>
+    <div class="echo">✦dossier / entry no. 001</div>
+    <div data-en="This page was written by Zhiyao Chen and their agent. A resume harness that won't let an agent verify it isn't much of a harness.">本页由 陈之遥 和 TA 的 agent 一起写成。不让 agent 插手的简历工具，说不过去。</div>
+    <div><a href="https://github.com/jorpeman10-cell/dossier" data-en="✦dossier — open-source verifiable resume harness">✦dossier — 开源可证伪简历 Harness</a></div>
+  </footer>
+
+</main>
+<script>
+  // Language toggle: elements carry data-en; original content is Chinese.
+  function setLang(lang){
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      if(el.dataset.zh === undefined){ el.dataset.zh = el.textContent; }
+      el.textContent = (lang === 'en') ? el.dataset.en : el.dataset.zh;
+    });
+    document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.documentElement.lang = lang;
+  }
+</script>
+</body>
+</html>

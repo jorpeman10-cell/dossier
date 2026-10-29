@@ -1,0 +1,54 @@
+# Example dossier data (FICTIONAL person — replace with interview output).
+# This is the machine-readable source of truth; the HTML page is rendered from it.
+meta:
+  entry_no: "001"
+  vol: 2026
+  city: Shanghai
+  name_zh: 陈之遥
+  name_en: Zhiyao Chen
+  tagline_zh: 医药AI解决方案架构师 · 肿瘤真实世界证据
+  tagline_en: Pharma AI Solutions Architect — oncology real-world evidence
+
+narrative:
+  # one-line self-definition ("在X和Y之间做翻译的人" pattern works well)
+  definition_zh: 在试验数据和治疗现实之间做翻译的人
+  definition_en: a translator between trial data and treatment reality
+  paragraphs_zh:
+    - 八年肿瘤证据生涯：前三年在医学事务读试验，后五年在建证据跑的那条数据管道……
+  paragraphs_en:
+    - I spent eight years turning oncology evidence into decisions...
+
+day:  # morning / afternoon / evening, concrete actions only
+  - {num: i, period_zh: 上午, period_en: morning, title_zh: 读证据, title_en: Read the evidence, body_zh: 扫完本周肿瘤文献和三条医保数据异动……, body_en: Sweep the week's oncology literature...}
+  - {num: ii, period_zh: 下午, period_en: afternoon, title_zh: 跑 agent, title_en: Run the agents, body_zh: 看着真实世界证据 agent 起草三份证据摘要……, body_en: Supervise the RWE agent...}
+  - {num: iii, period_zh: 晚上, period_en: evening, title_zh: 封装复用, title_en: Package the reuse, body_zh: 把人工纠正过两次的东西固化成可复用模块……, body_en: Turn whatever I corrected twice into a reusable module...}
+
+opinions:  # a peer must be able to disagree with these
+  - zh: 大部分「真实世界证据 AI」死在卖模型不卖证据地图……
+    en: Most "RWE AI products" die because they sell the model, not the evidence map...
+
+works:  # every item: link + mark; drop items with no link or story
+  - {no: "01", title_zh: 搭建肿瘤真实世界证据 agent 的田野手记, title_en: Building an oncology RWE agent — field notes, date: "2026-06", tag_zh: agent 工程, tag_en: agent engineering, url: "", mark: "◐", checked_on: "2026-10-28"}
+  - {no: "02", title_zh: 医保数据预警工作流（开源）, title_en: Claims-data early-warning workflow (open source), date: "2026-08", tag_zh: 工作流资产, tag_en: workflow asset, url: "", mark: "✓", checked_on: "2026-09-15"}
+
+field_log:  # every entry needs at least one evidence number
+  - {years: "2024 — NOW", role_zh: 医药AI解决方案架构师, role_en: Pharma AI Solutions Architect, org_zh: 某头部创新药企 · 医学事务 · 上海, org_en: A top-20 innovative pharma · Medical Affairs · Shanghai, body_zh: "RWE-X 证据平台从0到1：3个瘤种、11万患者数据池……", body_en: "Architected the RWE-X evidence platform from 0 to 1..."}
+
+toolbar:
+  silicon_zh: agent 系统设计 · Claude API / Agent SDK · 结构化证据 RAG · eval 测试框架 · LLMOps · Python · SQL · dbt
+  silicon_en: Agentic system design · Claude API & Agent SDK · RAG · eval harnesses · LLMOps · Python · SQL · dbt
+  carbon_zh: 肿瘤证据解读（8年）· 真实世界数据与医保数据 · 医学事务流程 · GxP 认知 · 卫生技术评估基础
+  carbon_en: Oncology evidence interpretation (8y) · RWD/RWE & claims data · medical affairs · GxP awareness · HTA basics
+
+contact:
+  ask_zh: 你手上还有什么决策，是纯靠人肉在拼的？
+  ask_en: What decision are you still making by hand?
+  email: example@example.com
+  visibility_note_zh: 在职信息脱敏 · 机会沟通走邮件
+  visibility_note_en: Company name withheld — availability discussed directly.
+
+privacy:  # NDA-tier items NEVER go on the page; keep them here for private-notes.md
+  nda_only:
+    - current employer legal name
+    - unreleased platform codenames
+    - salary / team structure

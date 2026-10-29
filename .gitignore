@@ -1,0 +1,17 @@
+# internal strategy docs — never publish
+/internal/
+
+# personal raw data
+p0/samples/linkedin-steven*.txt
+
+# generated outputs (pages are copied into docs/ for publishing)
+p0/out/
+
+# local
+.claude/
+.DS_Store
+Thumbs.db
+me/private-notes.md
+
+__pycache__/
+*.pyc
