@@ -25,6 +25,7 @@ def main() -> int:
     ap.add_argument("input")
     ap.add_argument("-o", "--out", default=None, help="output dir (default: p0/out/<stem>)")
     ap.add_argument("--backend", default="auto", choices=["auto", "anthropic", "mock"])
+    ap.add_argument("--no-workflows", action="store_true", help="skip P1 five-tuple workflow extraction")
     args = ap.parse_args()
 
     src = Path(args.input)
@@ -40,6 +41,16 @@ def main() -> int:
         for p in problems:
             print("   -", p)
         return 1
+
+    # P1: five-tuple workflow extraction (fail-closed per event)
+    if not args.no_workflows:
+        sys.path.insert(0, str(Path(__file__).parent.parent / "p1"))
+        from extract_steps import extract_all
+        obj["workflows"] = extract_all(obj)
+        n_nodes = sum(len(w.get("nodes", [])) for w in obj["workflows"])
+        n_inf = sum(1 for w in obj["workflows"] for e in w.get("edges", []) if e.get("inferred"))
+        rejected = sum(1 for w in obj["workflows"] if w.get("notes") and str(w["notes"][0]).startswith("EXTRACTION REJECTED"))
+        print(f"     workflows: nodes={n_nodes} inferred_edges={n_inf} rejected_events={rejected}")
 
     outdir = Path(args.out) if args.out else Path(__file__).parent / "out" / src.stem
     outdir.mkdir(parents=True, exist_ok=True)

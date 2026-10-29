@@ -93,6 +93,23 @@ TEMPLATE = r"""<!DOCTYPE html>
   .stat .mk{color:var(--dim);}
 
   footer{margin-top:64px;border-top:1px solid var(--line);padding-top:18px;color:var(--dim);font-size:12.5px;line-height:2.1;overflow-wrap:anywhere;}
+
+  /* workflows (V2) */
+  .wfl{margin-bottom:34px;}
+  .wfl-title{color:#f0f6fc;margin-bottom:10px;}
+  .wfl-title .org{color:var(--dim);font-size:13px;}
+  .wfl svg{display:block;}
+  .wfl .nbox{fill:#161b22;stroke:#30363d;rx:6;}
+  .wfl .nbox.confirmed{stroke:#3fb950;}
+  .wfl text{font-family:var(--mono);}
+  .wfl .nt{fill:#f0f6fc;font-size:13px;} .wfl .ns{fill:#8b949e;font-size:11px;}
+  .wfl .edge{stroke:#3fb950;stroke-width:1.5;fill:none;}
+  .wfl .edge.inf{stroke:#8b949e;stroke-dasharray:5 4;cursor:pointer;}
+  .wfl .edge.inf:hover{stroke:#d29922;}
+  .wfl .elabel{fill:#8b949e;font-size:10.5px;cursor:pointer;}
+  .wfl .legend{color:var(--dim);font-size:12.5px;margin:6px 0 8px;}
+  .btn{margin:18px 0 0;display:inline-block;border:1px solid #1b3a25;border-radius:6px;background:#0d1117;color:var(--green);padding:8px 18px;cursor:pointer;font-family:var(--mono);font-size:13.5px;}
+  .btn:hover{background:#1b3a25;}
   footer::before{content:"// ";}
 
   /* motion (jump-proof: fold-line reveal) */
@@ -136,6 +153,12 @@ TEMPLATE = r"""<!DOCTYPE html>
   <section class="reveal">
     <h2><span class="hash">##</span>evidence<span class="cm">cat claims.json | grep -v unverified</span></h2>
     <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="reveal" id="wsec">
+    <h2><span class="hash">##</span>workflows<span class="cm">five-tuple extraction · 实线=原文明示 · 虚线=AI推断(点击确认)</span></h2>
+    <div id="wfl"></div>
+    <button class="btn" id="exportBtn" style="display:none">↓ export confirmed talent-object.json</button>
   </section>
 
   <footer id="foot"></footer>
@@ -204,6 +227,93 @@ function stats(){
 }
 
 buildLog(); chips('silicon',(T.skills||{}).silicon); chips('carbon',(T.skills||{}).carbon); stats();
+
+// ---- workflows (V2): read-only flow projection + minimal confirm loop ----
+const WEDGES_CONFIRMED={};   // key "e<ei>:<from>-><to>" -> true (user confirmed)
+function buildWorkflows(){
+  const host=document.getElementById('wfl');
+  const sec=document.getElementById('wsec');
+  const wfs=T.workflows||[];
+  const usable=wfs.filter(w=>w.nodes&&w.nodes.length);
+  if(!usable.length){ host.innerHTML='<div class="empty">// no workflows extracted'+(wfs.length&&wfs[0].notes&&wfs[0].notes[0]?' — '+esc(String(wfs[0].notes[0]).slice(0,90)):'')+'</div>'; sec.style.display=(wfs.length?'':'none'); return; }
+  let html='';
+  usable.forEach(w=>{
+    const ev=(T.career_events||[])[w.event_index]||{};
+    const nInf=w.edges.filter(e=>e.inferred).length;
+    html+=`<div class="wfl"><div class="wfl-title">▸ ${esc(String(ev.role||''))} @ ${esc(String(ev.org||''))} <span class="org">// ${w.nodes.length} steps · ${nInf} inferred</span></div>`;
+    html+=`<svg data-ei="${w.event_index}" width="820" height="${0}" xmlns="http://www.w3.org/2000/svg"></svg></div>`;
+  });
+  host.innerHTML=html;
+  host.querySelectorAll('svg[data-ei]').forEach(svg=>{
+    const w=wfs.find(x=>x.event_index===+svg.dataset.ei);
+    drawFlow(svg,w);
+  });
+  // export confirmed json
+  const btn=document.getElementById('exportBtn');
+  btn.style.display='inline-block';
+  btn.onclick=()=>{
+    const out=JSON.parse(JSON.stringify(T));
+    (out.workflows||[]).forEach(w=>{ (w.edges||[]).forEach(e=>{
+      if(WEDGES_CONFIRMED[`e${w.event_index}:${e.from}->${e.to}`]) e.inferred=false; });});
+    delete out._generated_at;
+    const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='talent-object.confirmed.json'; a.click();
+  };
+}
+function drawFlow(svg,w){
+  const NW=176,NH=62,GX=54,GY=26,PAD=18;
+  svg.innerHTML='';   // full redraw (no duplicate elements on confirm)
+  // layering: longest path from edges (cycle-safe)
+  const id2n={}; w.nodes.forEach(n=>id2n[n.id]=n);
+  const layer={}; w.nodes.forEach(n=>layer[n.id]=0);
+  for(let it=0;it<w.nodes.length;it++){ let ch=false;
+    w.edges.forEach(e=>{ if(layer[e.to]<layer[e.from]+1){ layer[e.to]=layer[e.from]+1; ch=true; } });
+    if(!ch)break; }
+  const cols={}; w.nodes.forEach(n=>{ (cols[layer[n.id]]=cols[layer[n.id]]||[]).push(n); });
+  const keys=Object.keys(cols).map(Number).sort((a,b)=>a-b);
+  let H=0;
+  keys.forEach(k=>{ H=Math.max(H,PAD+cols[k].length*(NH+GY)); });
+  const W=PAD*2+keys.length*(NW+GX)-GX;
+  svg.setAttribute('width',Math.max(W,300)); svg.setAttribute('height',H);
+  const pos={};
+  keys.forEach(k=>{ cols[k].forEach((n,j)=>{ pos[n.id]={x:PAD+k*(NW+GX),y:PAD+j*(NH+GY)}; }); });
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(t,at,parent)=>{const el=document.createElementNS(NS,t);for(const a in at)el.setAttribute(a,at[a]);(parent||svg).appendChild(el);return el;};
+  const defs=mk('defs',{}); defs.innerHTML='<marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker>';
+  // nodes first (below)
+  w.nodes.forEach(n=>{
+    const p=pos[n.id];
+    const g=mk('g',{});
+    g.innerHTML=`<rect class="nbox" x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="6"/>
+      <text class="nt" x="${p.x+10}" y="${p.y+22}">${esc(String(n.verb||'').slice(0,10))} ${esc(String(n.object||'').slice(0,8))}</text>
+      <text class="ns" x="${p.x+10}" y="${p.y+40}">${esc([n.tool?'🛠'+String(n.tool).slice(0,10):'',n.collaborator?'👥'+String(n.collaborator).slice(0,8):''].filter(Boolean).join(' '))||'—'}</text>
+      <text class="ns" x="${p.x+10}" y="${p.y+55}">→ ${esc(String(n.output||'').slice(0,16))}</text>`;
+  });
+  // edges: adjacent layers -> bezier in the gap; skipping layers -> corridor polyline (never crosses a box)
+  const labels=[];
+  w.edges.forEach(e=>{
+    const a=pos[e.from],b=pos[e.to]; if(!a||!b)return;
+    const key=`e${w.event_index}:${e.from}->${e.to}`;
+    const inf=e.inferred&&!WEDGES_CONFIRMED[key];
+    const cls='edge'+(inf?' inf':'');
+    const dl=layer[e.to]-layer[e.from];
+    let d,lx,ly;
+    const x1=a.x+NW,y1=a.y+NH/2,x2=b.x,y2=b.y+NH/2;
+    if(dl<=1){ d=`M${x1},${y1} C${x1+24},${y1} ${x2-24},${y2} ${x2-2},${y2}`; lx=(x1+x2)/2; ly=(y1+y2)/2-7; }
+    else{ const mx=a.x+NW+GX/2; d=`M${x1},${y1} L${mx},${y1} L${mx},${y2} L${x2-2},${y2}`; lx=mx+0; ly=(y1+y2)/2; }
+    mk('path',{class:cls,d,'marker-end':'url(#arw)'});
+    if(e.inferred) labels.push({key,lx,ly,confirmed:!!WEDGES_CONFIRMED[key]});
+  });
+  // labels last (on top, clickable)
+  labels.forEach(o=>{
+    const t=mk('text',{class:'elabel',x:o.lx,y:o.ly,'text-anchor':'middle'});
+    t.textContent=o.confirmed?'已确认':'推断'; t.dataset.key=o.key;
+    t.addEventListener('click',()=>{ WEDGES_CONFIRMED[o.key]=!WEDGES_CONFIRMED[o.key]; drawFlow(svg,w); });
+  });
+}
+
+buildWorkflows();
 document.getElementById('foot').innerHTML=
   `backend: ${esc(T._backend||'?')} · ${esc(T._elapsed_s!=null?T._elapsed_s+'s':'')} · ${esc(T._generated_at||'')}<br>`+
   `inference: ${(T.inference_notes||[]).length?esc(T.inference_notes.join(' ； ')):'none'}<br>`+

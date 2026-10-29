@@ -1,0 +1,155 @@
+# Pharma value-chain verb dictionary (seed, v0.1)
+# Purpose: normalize resume duty verbs to canonical pharma-domain verbs,
+# improving five-tuple extraction quality and enabling domain tagging.
+# Format: canonical_verb: {domain, aliases[], typical_object, typical_output}
+
+入组:
+  domain: CLINICAL
+  aliases: [招募受试者, 筛选入组, 患者入组, subject enrollment]
+  typical_object: 受试者/临床试验
+  typical_output: 入组数据/进度报告
+随访:
+  domain: CLINICAL
+  aliases: [follow-up, 受试者随访]
+  typical_object: 受试者
+  typical_output: 随访记录
+监查:
+  domain: CLINICAL
+  aliases: [稽查, monitoring, site visit, 中心访视]
+  typical_object: 临床中心
+  typical_output: 监查报告
+数据清理:
+  domain: CLINICAL
+  aliases: [数据核查, query管理, data cleaning]
+  typical_object: 临床数据
+  typical_output: 清洁数据库
+锁库:
+  domain: CLINICAL
+  aliases: [数据库锁定, database lock]
+  typical_object: 临床数据库
+  typical_output: 锁库记录
+统计分析:
+  domain: CLINICAL
+  aliases: [SAS分析, 统计编程, TFL生成, statistical analysis]
+  typical_object: 临床数据
+  typical_output: 统计表格/TFL/CSR结果
+方案设计:
+  domain: CLINICAL
+  aliases: [试验方案撰写, protocol design]
+  typical_object: 临床试验方案
+  typical_output: 方案文档
+注册申报:
+  domain: REG
+  aliases: [递交, NDA申报, BLA申报, IND申报, regulatory submission]
+  typical_object: 注册资料
+  typical_output: 申报包/受理通知
+发补回复:
+  domain: REG
+  aliases: [补充资料, deficiency response]
+  typical_object: 监管问询
+  typical_output: 发补回复文件
+文献检索:
+  domain: MEDICAL
+  aliases: [文献调研, literature review, 文献监测]
+  typical_object: 学术文献
+  typical_output: 文献综述/证据简报
+证据解读:
+  domain: MEDICAL
+  aliases: [数据解读, evidence interpretation, 医学审阅]
+  typical_object: 临床/真实世界数据
+  typical_output: 医学观点/证据摘要
+医学策略:
+  domain: MEDICAL
+  aliases: [医学计划, medical plan]
+  typical_object: 产品
+  typical_output: 医学策略文档
+KOL管理:
+  domain: MEDICAL
+  aliases: [专家管理, KOL engagement]
+  typical_object: 学术专家
+  typical_output: 学术合作
+市场分析:
+  domain: COMMERCIAL
+  aliases: [竞争分析, 市场洞察, business insight]
+  typical_object: 市场/竞品
+  typical_output: 分析报告
+销售洞察:
+  domain: COMMERCIAL
+  aliases: [SFE分析, 业绩分析, territory analysis]
+  typical_object: 销售数据
+  typical_output: 洞察报告/看板
+定价:
+  domain: COMMERCIAL
+  aliases: [价格策略, pricing]
+  typical_object: 产品
+  typical_output: 定价方案
+医保谈判:
+  domain: MARKET_ACCESS
+  aliases: [国谈, 医保准入, reimbursement negotiation]
+  typical_object: 医保目录
+  typical_output: 谈判材料/准入结果
+集采投标:
+  domain: MARKET_ACCESS
+  aliases: [带量采购, VBP bidding]
+  typical_object: 集采标书
+  typical_output: 投标文件
+挂网:
+  domain: MARKET_ACCESS
+  aliases: [挂网申报, 省平台挂网]
+  typical_object: 省级采购平台
+  typical_output: 挂网价格记录
+准入测算:
+  domain: MARKET_ACCESS
+  aliases: [卫生经济学评估, HTA, 医保基金测算, 预算影响分析]
+  typical_object: 产品/医保基金
+  typical_output: 测算模型/报告
+合规审核:
+  domain: COMPLIANCE
+  aliases: [合规审查, compliance review]
+  typical_object: 推广材料/流程
+  typical_output: 审核意见
+药物警戒:
+  domain: COMPLIANCE
+  aliases: [PV, 个例报告处理, 不良反应报告]
+  typical_object: 安全性数据
+  typical_output: PV报告
+GxP验证:
+  domain: COMPLIANCE
+  aliases: [系统验证, CSA, computer system validation]
+  typical_object: 计算机化系统
+  typical_output: 验证文件
+数据建模:
+  domain: DATA
+  aliases: [建模, model building, 机器学习建模]
+  typical_object: 数据集
+  typical_output: 模型
+部署:
+  domain: DATA
+  aliases: [上线, deploy, 生产环境发布]
+  typical_object: 系统/模型
+  typical_output: 生产服务
+数据治理:
+  domain: DATA
+  aliases: [数据标准, 主数据管理, data governance]
+  typical_object: 数据资产
+  typical_output: 治理规范/数据质量
+培训:
+  domain: OPS
+  aliases: [赋能, training, 内训]
+  typical_object: 团队/客户
+  typical_output: 培训材料/场次
+搭建:
+  domain: OPS
+  aliases: [建设, 组建, build, 从0到1]
+  typical_object: 团队/平台/流程
+  typical_output: 平台/团队
+迁移:
+  domain: OPS
+  aliases: [系统迁移, migration, 上云]
+  typical_object: 系统/数据
+  typical_output: 新环境
+复盘:
+  domain: OPS
+  aliases: [事后分析, postmortem, 根因分析]
+  typical_object: 事故/项目
+  typical_output: 复盘报告
