@@ -19,3 +19,7 @@ me/private-notes.md
 
 __pycache__/
 *.pyc
+
+# butler runtime artifacts
+p2/demo/butler-audit.jsonl
+butler-audit.jsonl
