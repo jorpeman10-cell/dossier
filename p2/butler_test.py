@@ -68,6 +68,50 @@ def test_core():
     r = b.schedule_interview("2026-11-05 15:00")
     check("schedule stub queues", r.get("status") == "queued-stub")
 
+    # degraded audit: unwritable audit path (parent is a file) must not crash,
+    # must flag responses and fall back — sandboxed-harness scenario
+    tmp2 = Path(tempfile.mkdtemp())
+    blocker = tmp2 / "blocker"
+    blocker.write_text("not a dir", encoding="utf-8")
+    b2 = Butler(obj_path, audit_path=blocker / "sub" / "audit.jsonl")
+    r = b2.ask("做过医保信号监测吗")
+    check("degraded audit does not crash", "answer" in r)
+    check("degraded audit flagged in response", r.get("audit_degraded") is True)
+    r = b2.get_profile("career_events")
+    check("degraded flag on every response", r.get("audit_degraded") is True)
+
+    # ---- personal edition: resume & jobs management ----
+    print("== personal edition ==")
+    b3 = Butler(obj_path, audit_path=tmp / "audit.jsonl")
+    r = b3.resume_summary()
+    check("resume summary", r.get("events") is not None and len(r["events"]) >= 1)
+    n_before = len(json.loads(obj_path.read_text(encoding="utf-8"))["career_events"])
+    r = b3.resume_add_event(role="医药AI顾问", org="某AI公司", start="2027",
+                            highlights=["设计AI面试评估流程", "交付3个药企AI项目"], evidence_numbers=["3个药企项目"])
+    check("add event ok", r.get("ok") is True)
+    obj_now = json.loads(obj_path.read_text(encoding="utf-8"))
+    check("event persisted", len(obj_now["career_events"]) == n_before + 1)
+    baks = list(tmp.glob("to.json.bak-*.json"))
+    check("backup created before mutation", len(baks) == 1)
+    r = b3.resume_add_highlight(0, "新增：负责大模型评测体系建设")
+    check("add highlight ok", r.get("ok") is True)
+    r = b3.resume_add_skills(silicon=["模型评测"])
+    check("add skill ok", r.get("ok") is True and "模型评测" in json.loads(obj_path.read_text(encoding="utf-8"))["skills"]["silicon"])
+    r = b3.resume_regen_page()
+    check("regen page", r.get("ok") is True and (tmp / "page.html").exists() and (tmp / "page.html").stat().st_size > 1000)
+
+    r = b3.jobs_add(title="AI解决方案架构师", company="某创新药企", source="顾问推荐",
+                    description="负责医药AI平台建设，需要LobeHub部署经验、MCP工具开发、RAG与agent系统设计经验")
+    check("job added", r.get("ok") is True and "id" in r.get("job", {}))
+    jid = r["job"]["id"]
+    r = b3.jobs_match(jid)
+    check("job match runs", r.get("ok") is True and isinstance(r.get("match_score"), int), str(r)[:100])
+    check("match lists terms", isinstance(r.get("matched_terms"), list) or "error" in r)
+    r = b3.jobs_set_status(jid, "沟通中")
+    check("job status set", r.get("ok") is True and r["job"]["status"] == "沟通中")
+    r = b3.jobs_list()
+    check("jobs listed", len(r.get("jobs", [])) == 1)
+
 
 def test_mcp_stdio():
     print("== MCP stdio handshake ==")
@@ -88,7 +132,7 @@ def test_mcp_stdio():
     p.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
     p.stdin.flush()
     r = send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
-    check("tools/list has 6 tools", len(r["result"]["tools"]) == 6)
+    check("tools/list has 15 tools", len(r["result"]["tools"]) == 15)
     r = send({"jsonrpc": "2.0", "id": 3, "method": "tools/call",
               "params": {"name": "ask", "arguments": {"question": "做过真实世界证据平台吗"}}})
     body = json.loads(r["result"]["content"][0]["text"])

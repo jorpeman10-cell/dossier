@@ -36,6 +36,39 @@ TOOLS = [
      "inputSchema": {"type": "object", "properties": {
          "when": {"type": "string"}, "note": {"type": "string"}, "token": {"type": "string"}},
          "required": ["when"]}},
+    # ---- personal edition: resume & position management ----
+    {"name": "resume_summary", "description": "简历概况：经历列表/技能计数/证据总数",
+     "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "resume_add_event", "description": "新增一段经历（改前自动备份主副本）",
+     "inputSchema": {"type": "object", "properties": {
+         "role": {"type": "string"}, "org": {"type": "string"}, "start": {"type": "string"},
+         "end": {"type": "string"}, "highlights": {"type": "array", "items": {"type": "string"}},
+         "evidence_numbers": {"type": "array", "items": {"type": "string"}}},
+         "required": ["role", "org", "start", "highlights"]}},
+    {"name": "resume_add_highlight", "description": "给第 N 段经历追加一条职责/成果",
+     "inputSchema": {"type": "object", "properties": {
+         "event_index": {"type": "integer"}, "text": {"type": "string"}},
+         "required": ["event_index", "text"]}},
+    {"name": "resume_add_skills", "description": "追加技能（silicon=AI/数据侧, carbon=领域侧）",
+     "inputSchema": {"type": "object", "properties": {
+         "silicon": {"type": "array", "items": {"type": "string"}},
+         "carbon": {"type": "array", "items": {"type": "string"}}}}},
+    {"name": "resume_regen_page", "description": "从当前主副本重新生成简历页 page.html（终端范式）",
+     "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "jobs_add", "description": "记录一个在看的机会（title/company/source/notes/description=JD文本，用于匹配）",
+     "inputSchema": {"type": "object", "properties": {
+         "title": {"type": "string"}, "company": {"type": "string"}, "source": {"type": "string"},
+         "notes": {"type": "string"}, "description": {"type": "string"}},
+         "required": ["title", "company"]}},
+    {"name": "jobs_list", "description": "列出我在看的全部机会及状态",
+     "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "jobs_set_status", "description": "更新机会状态（看机会/已投递/沟通中/面试中/offer/放弃）",
+     "inputSchema": {"type": "object", "properties": {
+         "job_id": {"type": "string"}, "status": {"type": "string"}},
+         "required": ["job_id", "status"]}},
+    {"name": "jobs_match", "description": "关键词匹配：该职位 JD vs 我的档案（matched/missing 全列出，人做判断）",
+     "inputSchema": {"type": "object", "properties": {"job_id": {"type": "string"}},
+         "required": ["job_id"]}},
 ]
 
 PROTOCOL_VERSION = "2025-03-26"
@@ -55,6 +88,26 @@ def dispatch(butler: Butler, name: str, args: dict) -> dict:
         return butler.verify(args["claim_id"])
     if name == "schedule_interview":
         return butler.schedule_interview(args["when"], args.get("note", ""), token)
+    if name == "resume_summary":
+        return butler.resume_summary()
+    if name == "resume_add_event":
+        return butler.resume_add_event(args["role"], args["org"], args["start"],
+                                       args.get("end"), args["highlights"], args.get("evidence_numbers"))
+    if name == "resume_add_highlight":
+        return butler.resume_add_highlight(args["event_index"], args["text"])
+    if name == "resume_add_skills":
+        return butler.resume_add_skills(args.get("silicon"), args.get("carbon"))
+    if name == "resume_regen_page":
+        return butler.resume_regen_page()
+    if name == "jobs_add":
+        return butler.jobs_add(args["title"], args["company"], args.get("source", ""),
+                               args.get("notes", ""), args.get("description", ""))
+    if name == "jobs_list":
+        return butler.jobs_list()
+    if name == "jobs_set_status":
+        return butler.jobs_set_status(args["job_id"], args["status"])
+    if name == "jobs_match":
+        return butler.jobs_match(args["job_id"])
     return {"error": f"unknown tool {name}"}
 
 
