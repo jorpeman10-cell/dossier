@@ -1,0 +1,8 @@
+# dsh-butler-tools 的 profile bundle 补丁层。
+# 由 harness 的 dsh CLI 在安装时 reconcile 进 dsh.profile.bundles：
+#   dsh plugin --profile web add ../plugin-src/dsh-butler-tools
+# 该行挂在 host 平面（不依赖任何 agent preset），因此新开任何会话都能直接调用
+# butler_* 工具；重启 dsh 进程后依然生效（这是本包存在的唯一理由）。
+- insert:
+    - id: butler-tools
+      name: dsh-butler-tools

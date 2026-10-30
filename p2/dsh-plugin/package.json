@@ -1,0 +1,18 @@
+{
+  "name": "dsh-butler-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Career-Butler 原生工具壳：把 career-butler 的 15 个能力注册为 butler_* 原生工具，全部转发到 python 内核 CLI（无业务逻辑）",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT"
+}
